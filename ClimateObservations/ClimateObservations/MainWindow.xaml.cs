@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ClimateObservations.Repositories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,12 @@ namespace ClimateObservations
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var asda = MeasurementRepository.GetMeasurements();
+            var asd = "";
         }
     }
 }
