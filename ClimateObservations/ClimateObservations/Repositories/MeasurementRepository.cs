@@ -13,13 +13,17 @@ namespace ClimateObservations.Repositories
     {
         private static string connectionString = ConfigurationManager.ConnectionStrings["dbLocal"].ConnectionString;
 
+        #region GET
         public static Measurement GetMeasurement(int id)
         {
-            string stmt = "SELECT * FROM measurement WHERE id=@id";
+            string stmt = "SELECT id, value, category_id FROM measurement WHERE id=@id";
 
             using (var conn = new NpgsqlConnection(connectionString))
             {
                 conn.Open();
+                int categoryid;
+                Measurement found = null;
+
                 using (var command = new NpgsqlCommand(stmt, conn))
                 {
                     command.Parameters.AddWithValue("id", id);
@@ -28,26 +32,32 @@ namespace ClimateObservations.Repositories
                         if (!reader.HasRows)
                         {
                             return null;
-                        } 
+                        }
 
-                        Measurement found = new Measurement
+                        reader.Read();
+                        found = new Measurement
                         {
-                            Id = (int)reader["measurement.id"],
-                            Value = (float)reader["Measurement.value"]
+                            Id = (int)reader["id"],
+                            Value = reader["value"] == DBNull.Value ? null : (double?)reader["value"]
                         };
 
-                        return found;
+                        categoryid = (int)reader["category_id"];
                     }
                 }
+
+                found.Category = CategoryRepository.LoadCategoryRecursively(categoryid, conn);
+                return found;
             }
         }
 
         public static IEnumerable<Measurement> GetMeasurements()
         {
-            string stmt = "SELECT id, value FROM measurement";
+            string stmt = "SELECT id, value, category_id FROM measurement";
 
             using (var conn = new NpgsqlConnection(connectionString))
             {
+                var resulting = new List<(Measurement, int)>();
+
                 conn.Open();
                 using (var command = new NpgsqlCommand(stmt, conn))
                 {
@@ -58,21 +68,46 @@ namespace ClimateObservations.Repositories
                             return null;
                         }
 
-                        var resulting = new List<Measurement>();
-
                         while (reader.Read())
                         {
-                            Measurement found = new Measurement
+                            var found = (new Measurement
                             {
                                 Id = (int)reader["id"],
                                 Value = (double)reader["value"]
-                            };
+                            }, (int)reader["category_id"]);
 
                             resulting.Add(found);
                         }
 
-                        return resulting;
                     }
+                }
+
+                foreach (var m in resulting)
+                {
+                    m.Item1.Category = CategoryRepository.LoadCategoryRecursively(m.Item2, conn);
+                }
+
+                return resulting.Select(o => o.Item1);
+            }
+        }
+        #endregion
+
+        public static int AddMeasurement(int observationId, Measurement toAdd)
+        {
+            string stmt = "INSERT INTO measurement(value, categoryId) VALUES(@value, @categoryId) RETURNING id";
+
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                conn.Open();
+                using (var command = new NpgsqlCommand(stmt, conn))
+                {
+                    command.Parameters.AddWithValue("value", toAdd.Value);
+                    command.Parameters.AddWithValue("categoryId", toAdd.Category.Id);
+
+                    int id = (int)command.ExecuteScalar();
+                    toAdd.Id = id;
+
+                    return id;
                 }
             }
         }
