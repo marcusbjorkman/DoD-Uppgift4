@@ -50,9 +50,14 @@ namespace ClimateObservations.Repositories
             }
         }
 
-        public static IEnumerable<Measurement> GetMeasurements()
+        public static IEnumerable<Measurement> GetMeasurements(int? observationId = null)
         {
             string stmt = "SELECT id, value, category_id FROM measurement";
+
+            if (observationId != null)
+            {
+                stmt += " WHERE observation_id=@id";
+            }
 
             using (var conn = new NpgsqlConnection(connectionString))
             {
@@ -61,6 +66,11 @@ namespace ClimateObservations.Repositories
                 conn.Open();
                 using (var command = new NpgsqlCommand(stmt, conn))
                 {
+                    if (observationId != null)
+                    {
+                        command.Parameters.AddWithValue("id", observationId.Value);
+                    }
+
                     using (var reader = command.ExecuteReader())
                     {
                         if (!reader.HasRows)
@@ -108,6 +118,23 @@ namespace ClimateObservations.Repositories
                     toAdd.Id = id;
 
                     return id;
+                }
+            }
+        }
+
+        public static void PatchMeasurement(Measurement updated)
+        {
+            string stmt = "UPDATE measurement SET value=@value, category_id=@category_id WHERE id=@id";
+
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                using (var command = new NpgsqlCommand(stmt, conn))
+                {
+                    conn.Open();
+                    command.Parameters.AddWithValue("value", updated.Value);
+                    command.Parameters.AddWithValue("category_id", updated.Category.Id);
+                    command.Parameters.AddWithValue("id", updated.Id);
+                    command.ExecuteNonQuery();
                 }
             }
         }
