@@ -104,7 +104,7 @@ namespace ClimateObservations.Repositories
 
         public static int AddMeasurement(int observationId, Measurement toAdd)
         {
-            string stmt = "INSERT INTO measurement(value, categoryId) VALUES(@value, @categoryId) RETURNING id";
+            string stmt = "INSERT INTO measurement(value, category_id, observation_id) VALUES(@value, @categoryId, @observationId) RETURNING id";
 
             using (var conn = new NpgsqlConnection(connectionString))
             {
@@ -113,6 +113,7 @@ namespace ClimateObservations.Repositories
                 {
                     command.Parameters.AddWithValue("value", toAdd.Value);
                     command.Parameters.AddWithValue("categoryId", toAdd.Category.Id);
+                    command.Parameters.AddWithValue("observationId", observationId);
 
                     int id = (int)command.ExecuteScalar();
                     toAdd.Id = id;

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ClimateObservations.Repositories
 {
-    public class CategoryRepository
+    public static class CategoryRepository
     {
         private static string connectionString = ConfigurationManager.ConnectionStrings["dbLocal"].ConnectionString;
 
