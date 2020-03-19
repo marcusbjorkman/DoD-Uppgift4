@@ -104,7 +104,7 @@ namespace ClimateObservations.Repositories
         }
         #endregion
 
-        public static int AddMeasurement(int observationId, Measurement toAdd)
+        public static int AddMeasurement(Measurement toAdd)
         {
             string stmt = "INSERT INTO measurement(value, category_id, observation_id) VALUES(@value, @categoryId, @observationId) RETURNING id";
 
@@ -115,7 +115,7 @@ namespace ClimateObservations.Repositories
                 {
                     command.Parameters.AddWithValue("value", toAdd.Value ?? Convert.DBNull);
                     command.Parameters.AddWithValue("categoryId", toAdd.Category.Id);
-                    command.Parameters.AddWithValue("observationId", observationId);
+                    command.Parameters.AddWithValue("observationId", toAdd.ObservationId);
 
                     int id = (int)command.ExecuteScalar();
                     toAdd.Id = id;
@@ -138,6 +138,20 @@ namespace ClimateObservations.Repositories
                     command.Parameters.AddWithValue("category_id", updated.Category.Id);
                     command.Parameters.AddWithValue("id", updated.Id);
                     command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public static void DeleteMeasurement(int measurementId)
+        {
+            string stmt = "DELETE FROM measurement WHERE id = @id";
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                using (var command = new NpgsqlCommand(stmt, conn))
+                {
+                    conn.Open();
+                    command.Parameters.AddWithValue("id", measurementId);
+                    command.ExecuteScalar();
                 }
             }
         }

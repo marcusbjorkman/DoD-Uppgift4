@@ -12,5 +12,13 @@ namespace ClimateObservations.Models
         public string Name { get; set; }
         public Category BaseCategory { get; set; }
         public Unit Unit { get; set; }
+
+        public string ToDisplay
+        {
+            get
+            {
+                return Name + (Unit == null ? "" : ("/" + Unit.Abbreviation));
+            }
+        }
     }
 }

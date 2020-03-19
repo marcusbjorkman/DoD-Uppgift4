@@ -129,8 +129,8 @@ namespace ClimateObservations.Repositories
                             geolocation = new Geolocation
                             {
                                 Id = (int)reader["id"],
-                                Latitude = (float)reader["latitude"],
-                                Longitude = (float)reader["longitude"],
+                                Latitude = (double?)reader["latitude"],
+                                Longitude = (double?)reader["longitude"],
                                 Area_id = (int)reader["area_id"]
 
 

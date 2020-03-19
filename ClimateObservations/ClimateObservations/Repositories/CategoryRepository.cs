@@ -73,5 +73,29 @@ namespace ClimateObservations.Repositories
 
             return found;
         }
+
+        public static IEnumerable<Category> GetCategories()
+        {
+            string stmt = "SELECT id from category";
+
+            using (var connection = new NpgsqlConnection(connectionString))
+            {
+                connection.Open();
+                var categories = new List<int>();
+                using (var command = new NpgsqlCommand(stmt, connection))
+                {
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            categories.Add((int)reader["id"]);
+                        }
+                    }
+                }
+
+                var toReturn = categories.Select(o => LoadCategoryRecursively(o, connection));
+                return toReturn.ToList();
+            }
+        }
     }
 }

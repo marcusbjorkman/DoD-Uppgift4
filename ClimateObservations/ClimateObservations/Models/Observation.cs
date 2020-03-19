@@ -11,7 +11,6 @@ namespace ClimateObservations.Models
         public int Observer_id  { get; set; }
         public int Geolocation_id { get; set; }
 
-        public List<Observation> Locations { get; set; } = new List<Observation>();
         public List<Measurement> Measurements { get; set; } = new List<Measurement>();
     }
 }
