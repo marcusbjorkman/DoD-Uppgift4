@@ -36,14 +36,14 @@ namespace ClimateObservations.Repositories
                     found = new Category
                     {
                         Id = (int)reader["id"],
-                        Name = (string)reader["name"]
+                        Name = reader["name"] == DBNull.Value ? null : (string)reader["name"]
                     };
 
                     basecategoryId = reader["basecategory_id"] == DBNull.Value ? null : (int?)reader["basecategory_id"];
                     unitId = reader["unit_id"] == DBNull.Value ? null : (int?)reader["unit_id"];
                 }
             }
-            
+
             if (unitId.HasValue)
             {
                 using (var command = new NpgsqlCommand(u_stmt, conn))

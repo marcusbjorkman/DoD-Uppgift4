@@ -1,41 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Configuration;
+﻿using ClimateObservations.Models;
 using Npgsql;
-using ClimateObservations.Models;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Text;
 
 namespace ClimateObservations.Repositories
 {
-    public static class ObservationRepository
+    public static class ObserverRepository
     {
         private static string connectionString = ConfigurationManager.ConnectionStrings["dbLocal"].ConnectionString;
 
 
         // CRUD
         #region CREATE
-        public static int AddObservation(Observation observation)
+        public static int AddObserver(Observer observer)
         {
-            string stmt = "INSERT INTO observation(date, observer_id, geolocation_id) values(@date,@observer_id, @geolocation_id) returning id";
+            string stmt = "INSERT INTO observer(firstname, lastname) values(@lastname,@firstname) returning id";
 
             using (var conn = new NpgsqlConnection(connectionString))
             {
                 using (var command = new NpgsqlCommand(stmt, conn))
                 {
                     conn.Open();
-                    command.Parameters.AddWithValue("date", observation.Date);
-                    command.Parameters.AddWithValue("observer_id", observation.Observer_id);
-                    command.Parameters.AddWithValue("geolocation", observation.Geolocation_id);
+                    command.Parameters.AddWithValue("firstname", observer.Firstname);
+                    command.Parameters.AddWithValue("lastname", observer.Lastname);
+                   
                     int id = (int)command.ExecuteScalar();
-                    observation.Id = id;
+                    observer.Id = id;
                     return id;
                 }
             }
         }
 
-        public static void AddObservation(List<Observation> observations)
+        public static void AddObservers(List<Observer> observers)
         {
-            string stmt = "INSERT INTO observation(date, observer_id, geolocation_id) values(@date,@observer_id, @geolocation_id) returning id"; ;
+            string stmt = "INSERT INTO observer(firstname, lastname) values(@lastname,@firstname) returning id";
 
             using (var conn = new NpgsqlConnection(connectionString))
             {
@@ -46,11 +46,10 @@ namespace ClimateObservations.Repositories
                     {
                         using (var command = new NpgsqlCommand())
                         {
-                            foreach (var observation in observations)
+                            foreach (var observer in observers)
                             {
-                                command.Parameters.AddWithValue("date", observation.Date);
-                                command.Parameters.AddWithValue("observer_id", observation.Observer_id);
-                                command.Parameters.AddWithValue("geolocation", observation.Geolocation_id);
+                                command.Parameters.AddWithValue("firstname", observer.Firstname);
+                                command.Parameters.AddWithValue("lastname", observer.Lastname);
 
 
                                 //  command.Parameters.AddWithValue("model", car.Model ?? Convert.DBNull); // hva betyr ?? gjør slik at en verdi kan ha null
@@ -74,11 +73,13 @@ namespace ClimateObservations.Repositories
         #endregion
         #region READ
 
+       /*
         public static void GetObservation(bool withOwners = false)
         {
 
         }
-        public static Observation GetObservationWithobserver(int id)
+        */
+       /* public static Observation GetObservationWithobserver(int id)
         {
             //EF entity framework
 
@@ -98,97 +99,106 @@ namespace ClimateObservations.Repositories
                     command.Parameters.AddWithValue("id", id);
                     using (var reader = command.ExecuteReader())
                     {
-                        reader.Read();
-                        observation = new Observation
+                        while (reader.Read())
                         {
-                            Id = (int)reader["observation.id"],
-                            Date = (DateTime)reader["date"], // han har brukt store bokstaver
-                            Observer_id = (int)reader["observer_id"],
-                            Geolocation_id = (int)reader["observer_id"]
+                            observation = new Observation
+                            {
+                                Id = (int)reader["observation.id"],
+                                Date = (DateTime)reader["date"], // han har brukt store bokstaver
+                                Observer_id = (int)reader["observer_id"],
+                                Geolocation_id = (int)reader["observer_id"]
 
 
 
 
-                        };
+                            };
+                            observation.Observer.Add(new Observer
+                            {
+                                Id = (int)reader["observer.id"],
+                                Firstname = (string)reader["firstname"]
+                            });
+                        }
                     }
                 }
                 return observation;
             }
         }
-        public static IEnumerable<Observation> GetObservations(int? observationId = null)
+        */
+        public static IEnumerable<Observer> GetObservers()
         {
-            string stmt = "select date, observer_id,geolocation_id from observation";
-            if (observationId.HasValue)
-            {
-                stmt += " WHERE observer_id=@observerId";
-            }
+            string stmt = "select id, firstname,lastname from observer";
 
             using (var conn = new NpgsqlConnection(connectionString))
             {
-                Observation observation = null;
-                List<Observation> observations = new List<Observation>();
+                Observer observer = null;
+                List<Observer> observers = new List<Observer>();
                 conn.Open();
 
                 using (var command = new NpgsqlCommand(stmt, conn))
                 {
-                    if (observationId.HasValue)
-                    {
-                        command.Parameters.AddWithValue("observerId", observationId.Value);
-                    }
-
                     using (var reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            observation = new Observation
+                            observer = new Observer
                             {
-                                Date = (DateTime)reader["date"], // han har brukt store bokstaver
-                                Observer_id = (int)reader["observer_id"],
-                                Geolocation_id = (int)reader["geolocation_id"]
-
-
+                                Id = (int)reader["id"],
+                                Firstname = (string)reader["firstname"], 
+                                Lastname = (string)reader["lastname"]
                             };
-                            observations.Add(observation);
+                            observers.Add(observer);
                         }
                     }
                 }
-                return observations;
+                return observers;
             }
         }
 
         #endregion
         #region UPDATE
-        public static int SaveObservation(Observation observation)
+        public static int SaveObserver(Observer observer)
         {
-            string stmt = "UPDATE observation set date = @date, observer_id= @observer_id, geolocation_id= @geolocation_id where id=@id";
+            string stmt = "UPDATE observer set firstname = @firstname, lastname=@lastname where id=@id";
 
             using (var conn = new NpgsqlConnection(connectionString))
             {
                 using (var command = new NpgsqlCommand(stmt, conn))
                 {
                     conn.Open();
-                    command.Parameters.AddWithValue("date", observation.Date);
-                    command.Parameters.AddWithValue("observer_id", observation.Observer_id);
-                    command.Parameters.AddWithValue("geolocation", observation.Geolocation_id);
-                    command.Parameters.AddWithValue("id", observation.Id);
+                    command.Parameters.AddWithValue("firstname", observer.Firstname);
+                    command.Parameters.AddWithValue("lastname", observer.Lastname);
+                    command.Parameters.AddWithValue("id", observer.Id);
                     return command.ExecuteNonQuery();
                 }
             }
         }
         #endregion
         #region DELETE
-        public static void DeleteObservation(int id)
+        public static bool TryDeleteObserver(int id, out string errorCode)
         {
-            string stmt = "DELETE FROM observation WHERE id = @id";
+            string stmt = "DELETE FROM observer WHERE id = @id";
             using (var conn = new NpgsqlConnection(connectionString))
             {
                 using (var command = new NpgsqlCommand(stmt, conn))
                 {
                     conn.Open();
                     command.Parameters.AddWithValue("id", id);
-                    command.ExecuteScalar();
+                    try
+                    {
+                        command.ExecuteScalar();
+                    }
+                    catch(PostgresException e)
+                    {
+                        errorCode = e.SqlState;
+                        return false;
+                    }
+
+                    // observer kan ikke slette hvis de har gjort en observasjon
                 }
             }
+
+            errorCode = null;
+            return true;
         }
 
         public static void Delete(object poco)
@@ -198,4 +208,7 @@ namespace ClimateObservations.Repositories
         #endregion
     }
 }
+
+
+    
 

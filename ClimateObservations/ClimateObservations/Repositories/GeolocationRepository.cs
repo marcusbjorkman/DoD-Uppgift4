@@ -1,41 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Configuration;
+﻿using ClimateObservations.Models;
 using Npgsql;
-using ClimateObservations.Models;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
 
 namespace ClimateObservations.Repositories
 {
-    public static class ObservationRepository
+    class GeolocationRepository
     {
         private static string connectionString = ConfigurationManager.ConnectionStrings["dbLocal"].ConnectionString;
 
 
         // CRUD
         #region CREATE
-        public static int AddObservation(Observation observation)
+        public static int AddGeolocation(Geolocation geolocation)
         {
-            string stmt = "INSERT INTO observation(date, observer_id, geolocation_id) values(@date,@observer_id, @geolocation_id) returning id";
+            string stmt = "INSERT INTO geolocation( lattitude,longitude, area_id) values(@lattitude,@longitude, @area_id) returning id";
 
             using (var conn = new NpgsqlConnection(connectionString))
             {
                 using (var command = new NpgsqlCommand(stmt, conn))
                 {
                     conn.Open();
-                    command.Parameters.AddWithValue("date", observation.Date);
-                    command.Parameters.AddWithValue("observer_id", observation.Observer_id);
-                    command.Parameters.AddWithValue("geolocation", observation.Geolocation_id);
+                    command.Parameters.AddWithValue("latitude", geolocation.Latitude);
+                    command.Parameters.AddWithValue("longitude", geolocation.Longitude);
+                    command.Parameters.AddWithValue("area_id", geolocation.Area_id);
                     int id = (int)command.ExecuteScalar();
-                    observation.Id = id;
+                    geolocation.Id = id;
                     return id;
                 }
             }
         }
 
-        public static void AddObservation(List<Observation> observations)
+        public static void AddObservation(List<Geolocation> geolocations)
         {
-            string stmt = "INSERT INTO observation(date, observer_id, geolocation_id) values(@date,@observer_id, @geolocation_id) returning id"; ;
+            string stmt = "INSERT INTO geolocation( lattitude,longitude, area_id) values(@lattitude,@longitude, @area_id) returning id";
 
             using (var conn = new NpgsqlConnection(connectionString))
             {
@@ -46,11 +45,11 @@ namespace ClimateObservations.Repositories
                     {
                         using (var command = new NpgsqlCommand())
                         {
-                            foreach (var observation in observations)
+                            foreach (var geolocation in geolocations)
                             {
-                                command.Parameters.AddWithValue("date", observation.Date);
-                                command.Parameters.AddWithValue("observer_id", observation.Observer_id);
-                                command.Parameters.AddWithValue("geolocation", observation.Geolocation_id);
+                                command.Parameters.AddWithValue("latitude", geolocation.Latitude);
+                                command.Parameters.AddWithValue("longitude", geolocation.Longitude);
+                                command.Parameters.AddWithValue("area_id", geolocation.Area_id);
 
 
                                 //  command.Parameters.AddWithValue("model", car.Model ?? Convert.DBNull); // hva betyr ?? gjør slik at en verdi kan ha null
@@ -74,23 +73,23 @@ namespace ClimateObservations.Repositories
         #endregion
         #region READ
 
-        public static void GetObservation(bool withOwners = false)
+        public static void GetObservation(bool withObserver = false)
         {
 
         }
-        public static Observation GetObservationWithobserver(int id)
+        public static Geolocation GetGeolocationWithArea(int id)
         {
             //EF entity framework
 
 
 
-            string stmt = "select id, date,observer_id,geolocation_id from obeservation where id=@id";
+            string stmt = "select id, latitude,longitude,area_id from geolocation where id=@id";
             // stmt = "SELECT c.id as \"car.id\", c.model,c.make, p.id as \"person.id\", p.firstname, p.lastname FROM car c INNER JOIN person p on p.car_id = c.id  WHERE c.id = @id";
             stmt = "SELECT observation.id as \"observation.id\", observation.date,observation.observer_id, observer.id as \"observer.id\", observer.firstname, observer.lastname FROM observer observer INNER JOIN observation observation on observation.observer_id = observation.id  WHERE observation.id = @id";
 
             using (var conn = new NpgsqlConnection(connectionString))
             {
-                Observation observation = null;
+                Geolocation geolocation = null;
                 conn.Open();
 
                 using (var command = new NpgsqlCommand(stmt, conn))
@@ -99,60 +98,48 @@ namespace ClimateObservations.Repositories
                     using (var reader = command.ExecuteReader())
                     {
                         reader.Read();
-                        observation = new Observation
+                        geolocation = new Geolocation
                         {
-                            Id = (int)reader["observation.id"],
-                            Date = (DateTime)reader["date"], // han har brukt store bokstaver
-                            Observer_id = (int)reader["observer_id"],
-                            Geolocation_id = (int)reader["observer_id"]
-
-
-
-
+                            Id = (int)reader["id"],
+                            Latitude = (float)reader["latitude"],
+                            Longitude = (float)reader["longitude"],
+                            Area_id = (int)reader["area_id"]
                         };
                     }
                 }
-                return observation;
+                return geolocation;
             }
         }
-        public static IEnumerable<Observation> GetObservations(int? observationId = null)
+        public static IEnumerable<Geolocation> GetGelocations()
         {
-            string stmt = "select date, observer_id,geolocation_id from observation";
-            if (observationId.HasValue)
-            {
-                stmt += " WHERE observer_id=@observerId";
-            }
+            string stmt = "select id, latitude, longitude, area_id from geolocation";
 
             using (var conn = new NpgsqlConnection(connectionString))
             {
-                Observation observation = null;
-                List<Observation> observations = new List<Observation>();
+                Geolocation geolocation = null;
+                List<Geolocation> geolocations = new List<Geolocation>();
                 conn.Open();
 
                 using (var command = new NpgsqlCommand(stmt, conn))
                 {
-                    if (observationId.HasValue)
-                    {
-                        command.Parameters.AddWithValue("observerId", observationId.Value);
-                    }
-
                     using (var reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            observation = new Observation
+                            geolocation = new Geolocation
                             {
-                                Date = (DateTime)reader["date"], // han har brukt store bokstaver
-                                Observer_id = (int)reader["observer_id"],
-                                Geolocation_id = (int)reader["geolocation_id"]
+                                Id = (int)reader["id"],
+                                Latitude = (float)reader["latitude"],
+                                Longitude = (float)reader["longitude"],
+                                Area_id = (int)reader["area_id"]
 
 
                             };
-                            observations.Add(observation);
+                            geolocations.Add(geolocation);
                         }
                     }
                 }
-                return observations;
+                return geolocations;
             }
         }
 
@@ -160,7 +147,7 @@ namespace ClimateObservations.Repositories
         #region UPDATE
         public static int SaveObservation(Observation observation)
         {
-            string stmt = "UPDATE observation set date = @date, observer_id= @observer_id, geolocation_id= @geolocation_id where id=@id";
+            string stmt = "UPDATE geolocation set latitude = @latitude, longitude= @longitude, area_id= @area_id where id=@id";
 
             using (var conn = new NpgsqlConnection(connectionString))
             {
@@ -179,7 +166,7 @@ namespace ClimateObservations.Repositories
         #region DELETE
         public static void DeleteObservation(int id)
         {
-            string stmt = "DELETE FROM observation WHERE id = @id";
+            string stmt = "DELETE FROM geolocation WHERE id = @id";
             using (var conn = new NpgsqlConnection(connectionString))
             {
                 using (var command = new NpgsqlCommand(stmt, conn))
@@ -198,4 +185,5 @@ namespace ClimateObservations.Repositories
         #endregion
     }
 }
+
 

@@ -5,9 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClimateObservations"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="659">
     <Grid>
-        <Button Content="Button" Click="Button_Click" HorizontalAlignment="Left" Margin="337,175,0,0" VerticalAlignment="Top" Width="75"/>
-
+        <ListBox x:Name="AllObserversListBox" HorizontalAlignment="Left" Height="265" Margin="68,10,0,0" VerticalAlignment="Top" Width="310"/>
+        <Button x:Name="BtnAddObserver" Click="BtnAddObserver_Click" Content="Lägg till" HorizontalAlignment="Left" Margin="426,97,0,0" VerticalAlignment="Top" Width="75"/>
+        <TextBox x:Name="TxtBoxFirstName" HorizontalAlignment="Left" Height="23" Margin="426,41,0,0" TextWrapping="Wrap" Text="Förnamn" VerticalAlignment="Top" Width="120"/>
+        <TextBox Name="TxtBoxLastName" HorizontalAlignment="Left" Height="23" Margin="426,69,0,0" TextWrapping="Wrap" Text="Efternamn" VerticalAlignment="Top" Width="120"/>
+        <Label Content="Lägg till en ny observatör" HorizontalAlignment="Left" Margin="426,10,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="BtnDeleteObserver" Click="BtnDeleteObserver_Click" Content="Radera" HorizontalAlignment="Left" Margin="426,164,0,0" VerticalAlignment="Top" Width="75"/>
+        <Label Content="Ta bort vald observatör" HorizontalAlignment="Left" Margin="426,133,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="BtnLogIn" Click="BtnLogIn_Click" Content="Logga in med vald observatör" HorizontalAlignment="Left" Margin="197,280,0,0" VerticalAlignment="Top" Width="181"/>
     </Grid>
 </Window>

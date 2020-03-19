@@ -87,12 +87,22 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Models\Area.cs" />
     <Compile Include="Models\Category.cs" />
+    <Compile Include="Models\Country.cs" />
+    <Compile Include="Models\Geolocation.cs" />
     <Compile Include="Models\Measurement.cs" />
+    <Compile Include="Models\Observation.cs" />
+    <Compile Include="Models\Observer.cs" />
     <Compile Include="Models\Unit.cs" />
+    <Compile Include="ObservationWindow.xaml.cs">
+      <DependentUpon>ObservationWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Repositories\CategoryRepository.cs" />
+    <Compile Include="Repositories\GeolocationRepository.cs" />
     <Compile Include="Repositories\MeasurementRepository.cs" />
     <Compile Include="Repositories\ObservationRepository.cs" />
+    <Compile Include="Repositories\ObserverRepository.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -105,6 +115,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="ObservationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

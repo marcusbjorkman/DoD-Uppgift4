@@ -9,6 +9,7 @@ namespace ClimateObservations.Models
     public class Measurement
     {
         public int Id { get; set; }
+        public int ObservationId { get; set; }
         public double? Value { get; set; }
         public Category Category { get; set; }
     }

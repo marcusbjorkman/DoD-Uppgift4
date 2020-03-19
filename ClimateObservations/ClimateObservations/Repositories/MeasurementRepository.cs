@@ -16,7 +16,7 @@ namespace ClimateObservations.Repositories
         #region GET
         public static Measurement GetMeasurement(int id)
         {
-            string stmt = "SELECT id, value, category_id FROM measurement WHERE id=@id";
+            string stmt = "SELECT id, value, observation_id, category_id FROM measurement WHERE id=@id";
 
             using (var conn = new NpgsqlConnection(connectionString))
             {
@@ -38,7 +38,8 @@ namespace ClimateObservations.Repositories
                         found = new Measurement
                         {
                             Id = (int)reader["id"],
-                            Value = reader["value"] == DBNull.Value ? null : (double?)reader["value"]
+                            Value = reader["value"] == DBNull.Value ? null : (double?)reader["value"],
+                            ObservationId = (int)reader["observation_id"]
                         };
 
                         categoryid = (int)reader["category_id"];
@@ -52,7 +53,7 @@ namespace ClimateObservations.Repositories
 
         public static IEnumerable<Measurement> GetMeasurements(int? observationId = null)
         {
-            string stmt = "SELECT id, value, category_id FROM measurement";
+            string stmt = "SELECT id, value, observation_id, category_id FROM measurement";
 
             if (observationId != null)
             {
@@ -83,7 +84,8 @@ namespace ClimateObservations.Repositories
                             var found = (new Measurement
                             {
                                 Id = (int)reader["id"],
-                                Value = (double)reader["value"]
+                                Value = (double)reader["value"],
+                                ObservationId = (int)reader["observation_id"]
                             }, (int)reader["category_id"]);
 
                             resulting.Add(found);
@@ -111,7 +113,7 @@ namespace ClimateObservations.Repositories
                 conn.Open();
                 using (var command = new NpgsqlCommand(stmt, conn))
                 {
-                    command.Parameters.AddWithValue("value", toAdd.Value);
+                    command.Parameters.AddWithValue("value", toAdd.Value ?? Convert.DBNull);
                     command.Parameters.AddWithValue("categoryId", toAdd.Category.Id);
                     command.Parameters.AddWithValue("observationId", observationId);
 

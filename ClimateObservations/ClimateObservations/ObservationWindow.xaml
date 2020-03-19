@@ -1,0 +1,14 @@
+﻿<Window x:Class="ClimateObservations.ObservationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ClimateObservations"
+        mc:Ignorable="d"
+        Title="ObservationWindow" Height="450" Width="800">
+    <Grid>
+        <ListBox x:Name="ListBoxObservations" HorizontalAlignment="Left" Height="286" Margin="28,68,0,0" VerticalAlignment="Top" Width="234"/>
+        <Label Content="Observationer" HorizontalAlignment="Left" Margin="28,37,0,0" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>
