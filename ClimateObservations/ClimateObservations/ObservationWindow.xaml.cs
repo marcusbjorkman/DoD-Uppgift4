@@ -1,18 +1,9 @@
 ﻿using ClimateObservations.Models;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using static ClimateObservations.Repositories.ObservationRepository;
 using static ClimateObservations.Repositories.GeolocationRepository;
 using static ClimateObservations.Repositories.MeasurementRepository;
@@ -35,6 +26,7 @@ namespace ClimateObservations
         {
             InitializeComponent();
             _observer = observer;
+            ObserverLabel.Content = _observer.FullName;
 
             ObservationsComboBox.ItemsSource = ObservationList;
             ObservationsComboBox.DisplayMemberPath = nameof(Observation.Date);
@@ -60,6 +52,9 @@ namespace ClimateObservations
             ComboBoxCategory.ItemsSource = CategoryList;
             ComboBoxCategory.DisplayMemberPath = nameof(Category.ToDisplay);
 
+            ComboBoxUpdateCategory.ItemsSource = CategoryList;
+            ComboBoxUpdateCategory.DisplayMemberPath = nameof(Category.ToDisplay);
+
             var categories = GetCategories();
             foreach (var c in categories)
             {
@@ -69,17 +64,41 @@ namespace ClimateObservations
 
         private void BtnAddObservation_Click(object sender, RoutedEventArgs e)
         {
+            var selectedGeolocation = GeolocationsComboBox.SelectedItem as Geolocation;
+            if (selectedGeolocation == null)
+            {
+                return;
+            }
 
+            var newObservation = new Observation
+            {
+                Date = DateTime.Now,
+                Observer_id = _observer.Id,
+                Geolocation_id = selectedGeolocation.Id
+            };
+
+            AddObservation(newObservation);
+            ObservationList.Add(newObservation);
         }
 
         private void ObservationsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             MeasurementList.Clear();
 
-            var measurements = GetMeasurements(_observer.Id);
-            foreach (var m in measurements)
+            var selectedObservation = ObservationsComboBox.SelectedItem as Observation;
+            if (selectedObservation == null)
             {
-                MeasurementList.Add(m);
+                return;
+            }
+
+            var measurements = GetMeasurements(selectedObservation.Id);
+
+            if (measurements != null)
+            {
+                foreach (var m in measurements)
+                {
+                    MeasurementList.Add(m);
+                }
             }
         }
 
@@ -110,6 +129,33 @@ namespace ClimateObservations
 
         private void BtnUpdateMeasurement_Click(object sender, RoutedEventArgs e)
         {
+            var selectedCategory = ComboBoxUpdateCategory.SelectedItem as Category;
+            if (selectedCategory == null)
+            {
+                // felmeddelande??
+                return;
+            }
+
+            double? value = null;
+            if (double.TryParse(TxtBoxUpdateMeasurementValue.Text, out double v))
+            {
+                value = v;
+            }
+
+            var selectedMeasurement = MeasurementsListBox.SelectedItem as Measurement;
+            if (selectedMeasurement == null)
+            {
+                // felmeddelande??
+                return;
+            }
+
+            selectedMeasurement.Category = selectedCategory;
+            selectedMeasurement.Value = value;
+
+            PatchMeasurement(selectedMeasurement);
+            var toRemove = MeasurementList.SingleOrDefault(o => o.Id == selectedMeasurement.Id);
+            MeasurementList.Remove(toRemove);
+            MeasurementList.Add(selectedMeasurement);
         }
 
         private void BtnDeleteMeasurement_Click(object sender, RoutedEventArgs e)
@@ -117,10 +163,24 @@ namespace ClimateObservations
             var selectedMeasurement = MeasurementsListBox.SelectedItem as Measurement;
             if (selectedMeasurement == null)
             {
+                // felmeddelande??
                 return;
             }
 
             DeleteMeasurement(selectedMeasurement.Id);
+        }
+
+        private void MeasurementsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selectedMeasurement = MeasurementsListBox.SelectedItem as Measurement;
+            if (selectedMeasurement == null)
+            {
+                // felmeddelande??
+                return;
+            }
+
+            ComboBoxUpdateCategory.SelectedItem = selectedMeasurement.Category;
+            TxtBoxUpdateMeasurementValue.Text = selectedMeasurement.Value.ToString();
         }
     }
 }

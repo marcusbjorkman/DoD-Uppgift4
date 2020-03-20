@@ -25,7 +25,7 @@ namespace ClimateObservations.Repositories
                     conn.Open();
                     command.Parameters.AddWithValue("date", observation.Date);
                     command.Parameters.AddWithValue("observer_id", observation.Observer_id);
-                    command.Parameters.AddWithValue("geolocation", observation.Geolocation_id);
+                    command.Parameters.AddWithValue("geolocation_id", observation.Geolocation_id);
                     int id = (int)command.ExecuteScalar();
                     observation.Id = id;
                     return id;
@@ -117,7 +117,7 @@ namespace ClimateObservations.Repositories
         }
         public static IEnumerable<Observation> GetObservations(int? observationId = null)
         {
-            string stmt = "select date, observer_id,geolocation_id from observation";
+            string stmt = "select id, date, observer_id,geolocation_id from observation";
             if (observationId.HasValue)
             {
                 stmt += " WHERE observer_id=@observerId";
@@ -142,11 +142,10 @@ namespace ClimateObservations.Repositories
                         {
                             observation = new Observation
                             {
+                                Id = (int)reader["id"],
                                 Date = (DateTime)reader["date"], // han har brukt store bokstaver
                                 Observer_id = (int)reader["observer_id"],
                                 Geolocation_id = (int)reader["geolocation_id"]
-
-
                             };
                             observations.Add(observation);
                         }

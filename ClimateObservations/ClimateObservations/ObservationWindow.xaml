@@ -9,18 +9,22 @@
     <Grid>
         <Label Content="Välj observation" HorizontalAlignment="Left" Margin="28,37,0,0" VerticalAlignment="Top"/>
         <ComboBox x:Name="ObservationsComboBox" SelectionChanged="ObservationsComboBox_SelectionChanged" HorizontalAlignment="Left" Margin="28,63,0,0" VerticalAlignment="Top" Width="120"/>
-        <ListBox x:Name="MeasurementsListBox" HorizontalAlignment="Left" Height="178" Margin="196,63,0,0" VerticalAlignment="Top" Width="164"/>
+        <ListBox x:Name="MeasurementsListBox" SelectionChanged="MeasurementsListBox_SelectionChanged" HorizontalAlignment="Left" Height="178" Margin="196,63,0,0" VerticalAlignment="Top" Width="164"/>
         <Label Content="Mätvärden" HorizontalAlignment="Left" Margin="196,37,0,0" VerticalAlignment="Top"/>
         <Label Content="Lägg till en ny observation" HorizontalAlignment="Left" Margin="28,117,0,0" VerticalAlignment="Top"/>
         <ComboBox x:Name="GeolocationsComboBox" HorizontalAlignment="Left" Margin="28,168,0,0" VerticalAlignment="Top" Width="120"/>
         <Label Content="Välj geografisk plats" HorizontalAlignment="Left" Margin="28,142,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.023,0.431"/>
         <Button x:Name="BtnAddObservation" Content="Lägg till" Click="BtnAddObservation_Click" HorizontalAlignment="Left" Margin="28,195,0,0" VerticalAlignment="Top" Width="75"/>
-        <Button x:Name="BtnUpdateMeasurement" Content="Redigera" Click="BtnUpdateMeasurement_Click" HorizontalAlignment="Left" Margin="196,246,0,0" VerticalAlignment="Top" Width="75"/>
         <Button x:Name="BtnDeleteMeasurement" Content="Ta bort" Click="BtnDeleteMeasurement_Click" HorizontalAlignment="Left" Margin="285,246,0,0" VerticalAlignment="Top" Width="75"/>
-        <ComboBox x:Name="ComboBoxCategory" HorizontalAlignment="Left" Margin="391,95,0,0" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="TxtBoxMeasurementValue" HorizontalAlignment="Left" Height="23" Margin="391,129,0,0" TextWrapping="Wrap" Text="Value" VerticalAlignment="Top" Width="120"/>
-        <Label Content="Nytt mätvärde" HorizontalAlignment="Left" Margin="391,67,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="BtnAddMeasurement" Content="Lägg till" Click="BtnAddMeasurement_Click" HorizontalAlignment="Left" Margin="391,157,0,0" VerticalAlignment="Top" Width="75"/>
+        <ComboBox x:Name="ComboBoxCategory" HorizontalAlignment="Left" Margin="380,66,0,0" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="TxtBoxMeasurementValue" HorizontalAlignment="Left" Height="23" Margin="380,100,0,0" TextWrapping="Wrap" Text="Value" VerticalAlignment="Top" Width="120"/>
+        <Label Content="Nytt mätvärde" HorizontalAlignment="Left" Margin="380,38,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="BtnAddMeasurement" Content="Lägg till" Click="BtnAddMeasurement_Click" HorizontalAlignment="Left" Margin="380,128,0,0" VerticalAlignment="Top" Width="75"/>
+        <ComboBox x:Name="ComboBoxUpdateCategory" HorizontalAlignment="Left" Margin="380,189,0,0" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="TxtBoxUpdateMeasurementValue" HorizontalAlignment="Left" Height="23" Margin="380,223,0,0" TextWrapping="Wrap" Text="Value" VerticalAlignment="Top" Width="120"/>
+        <Label Content="Ändra befintligt mätvärde" HorizontalAlignment="Left" Margin="380,161,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="BtnUpdateMeasurement" Content="Uppdatera" Click="BtnUpdateMeasurement_Click" HorizontalAlignment="Left" Margin="380,251,0,0" VerticalAlignment="Top" Width="75"/>
+        <Label x:Name="ObserverLabel" Content="" HorizontalAlignment="Left" Margin="28,0,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>
